@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  web:
+    image: nginx:stable-alpine
+    container_name: webserver
+    depends_on:
+      - db
+      - php
+    links:
+      - db
+      - php
+    volumes:
+      - ./app:/var/www/html
+      - ./nginx:/etc/nginx/conf.d/
+    ports:
+      - "8080:80"
+
+  php:
+    image: php:5.6.40-fpm-alpine
+    container_name: php-fpm
+    volumes:
+      - ./app:/var/www/html/
+
+  db:
+    image: mariadb
+    container_name: database
+    restart: always
+    volumes:
+      - ./data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "8889:3306"
+
+volumes:
+  data:
